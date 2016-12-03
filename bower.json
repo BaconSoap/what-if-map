@@ -12,7 +12,8 @@
     "foundation-sites": "~6.2.0",
     "motion-ui": "~1.2.2",
     "leaflet": "^1.0.2",
-    "tile.stamen": "http://maps.stamen.com/js/tile.stamen.js?v1.3.0"
+    "tile.stamen": "http://maps.stamen.com/js/tile.stamen.js?v1.3.0",
+    "chroma-js": "^1.1.1"
   },
   "ignore": [
     "**/.*",
