@@ -1,5 +1,6 @@
 var gulp = require('gulp');
 var $    = require('gulp-load-plugins')();
+var gls  = require('gulp-live-server');
 
 var sassPaths = [
   'bower_components/foundation-sites/scss',
@@ -19,6 +20,14 @@ gulp.task('sass', function() {
     .pipe(gulp.dest('css'));
 });
 
-gulp.task('default', ['sass'], function() {
+gulp.task('serve', () => {
+  var server = gls.static('./', 3000);
+  server.start();
+  gulp.watch(['js/**/*.js', 'index.html', 'css/**/**.css'], file => {
+    server.notify.apply(server, [file]);
+  });
+})
+
+gulp.task('default', ['sass', 'serve'], function() {
   gulp.watch(['scss/**/*.scss'], ['sass']);
 });
