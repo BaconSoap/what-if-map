@@ -7,7 +7,7 @@ MAPSHAPER='../node_modules/.bin/mapshaper'
 
 # download file
 mkdir -p data
-pushd data
+cd data
 curl $SOURCE_URL >> source.zip
 unzip -o source.zip $SHP_FILE $DBF_FILE
 mv $SHP_FILE data.shp
@@ -22,4 +22,4 @@ $MAPSHAPER data.shp -simplify 10% -dissolve STATEFP -o states.json force id-fiel
 
 rm data.dbf data.shp source.zip
 
-popd
+cd ..
