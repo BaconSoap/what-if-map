@@ -1,10 +1,10 @@
 {
-  "name": "foundation-sites-template",
+  "name": "what-if-map",
   "version": "1.0.0",
   "authors": [
-    "ZURB <foundation@zurb.com>"
+    "Andrew Varnerin <andrew@varnerin.info>"
   ],
-  "description": "Basic template for a new Foundation for Sites project.",
+  "description": "A \"What if...?\" look at the 2016 US Election.",
   "main": "index.html",
   "license": "MIT",
   "homepage": "http://foundation.zurb.com",
