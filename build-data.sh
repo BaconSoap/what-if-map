@@ -32,7 +32,7 @@ $MAPSHAPER data.shp -simplify 10% \
   -filter-fields "total_votes,votes_dem,votes_gop,county_name,state_abbr,POP_ESTIMATE_2015,STATEFP" \
   -o counties.json force id-field=GEOID format=geojson
 
-$MAPSHAPER counties.json -simplify 10% \
+$MAPSHAPER counties.json \
   -dissolve STATEFP sum-fields='POP_ESTIMATE_2015,total_votes,votes_dem,votes_gop' copy-fields='state_abbr' \
   -o states.json force id-field=STATEFP format=geojson
 

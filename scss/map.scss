@@ -2,6 +2,10 @@
   width: 100%;
   height: 700px;
   border: 2px solid lighten($color: orange, $amount: 20);
+  &.z4,&.z3,&.z2,&.z1 {
+    path.county {
+    }
+  }
 }
 
 .county-info {
@@ -12,6 +16,7 @@
     box-shadow: 0 0 15px rgba(0,0,0,0.2);
     border-radius: 5px;
 }
+
 .county-info h4 {
     margin: 0 0 5px;
     color: #777;
@@ -20,3 +25,4 @@
 .no-pointer-events {
   pointer-events: none !important;
 }
+

@@ -13,7 +13,8 @@
     "motion-ui": "~1.2.2",
     "leaflet": "^1.0.2",
     "tile.stamen": "http://maps.stamen.com/js/tile.stamen.js?v1.3.0",
-    "chroma-js": "^1.1.1"
+    "chroma-js": "^1.1.1",
+    "leaflet.zoomcss": "https://raw.githubusercontent.com/dagjomar/Leaflet.ZoomCSS/master/src/leaflet.zoomcss.js"
   },
   "ignore": [
     "**/.*",

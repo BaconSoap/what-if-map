@@ -44,12 +44,13 @@ var demRepubScale = chroma.scale(['red', 'white', 'blue']).domain([-1, 0, 1]);
       var countiesLayer = L.geoJSON(data, {
         pane: 'counties',
         style: function (feature) {
-          var p = feature.properties;
+          var color = getColor(feature);
           return {
             fillOpacity: .9,
-            fillColor: demRepubScale((p.votes_dem - p.votes_gop) / p.total_votes * 2),
-            color: 'grey',
-            weight: 1
+            fillColor: color,
+            color: color,
+            weight: 1,
+            className: 'county'
           };
         },
         onEachFeature: function (feature, layer) {
@@ -64,11 +65,16 @@ var demRepubScale = chroma.scale(['red', 'white', 'blue']).domain([-1, 0, 1]);
       map.addLayer(countiesLayer);
     });
 
+    function getColor(feature) {
+      var p = feature.properties;
+      return demRepubScale((p.votes_dem - p.votes_gop) / p.total_votes * 2);
+    }
+
     function onHover(e) {
       var layer = e.target;
       layer.setStyle({
         weight: 5,
-        color: '#999'
+        color: 'gold'
       });
       countyInfo.update(layer.feature.properties);
     }
@@ -77,7 +83,7 @@ var demRepubScale = chroma.scale(['red', 'white', 'blue']).domain([-1, 0, 1]);
       var layer = e.target;
       layer.setStyle({
         weight: 1,
-        color: 'grey'
+        color: getColor(layer.feature)
       });
 
       countyInfo.update();
