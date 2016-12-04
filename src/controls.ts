@@ -1,7 +1,7 @@
 type OnChangeEvent = Event & {target: HTMLInputElement};
 
 namespace app {
-  export let countyInfo = L.Control.extend({
+  export let CountyInfo = L.Control.extend({
     onAdd: function (map: L.Map) {
       this._div = L.DomUtil.create('div', 'custom-control county-info');
       this.update();

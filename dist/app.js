@@ -1,6 +1,6 @@
 var app;
 (function (app) {
-    app.countyInfo = L.Control.extend({
+    app.CountyInfo = L.Control.extend({
         onAdd: function (map) {
             this._div = L.DomUtil.create('div', 'custom-control county-info');
             this.update();
@@ -43,6 +43,7 @@ var app;
     var allCountyData;
     var countiesLayers = {};
     var map;
+    var countyInfo;
     function init() {
         // create a new map with no base layer
         map = L.map('election-map', {
@@ -54,7 +55,8 @@ var app;
         map.addLayer(layer);
         addCounties('2016');
         addStates();
-        app.countyInfo.addTo(map);
+        countyInfo = new app.CountyInfo();
+        countyInfo.addTo(map);
         var selector = new app.dropdownControl({ selectOptions: [{ text: '2016' }, { text: '2012' }], label: 'Year:' });
         selector.addTo(map);
         selector.onChange(function (e) {
@@ -116,7 +118,7 @@ var app;
                 weight: 5,
                 color: 'gold'
             });
-            app.countyInfo.update(layer.feature.properties, activeYear);
+            countyInfo.update(layer.feature.properties, activeYear);
         }
         function onUnhover(e) {
             var layer = e.target;
@@ -124,7 +126,7 @@ var app;
                 weight: 1,
                 color: getColor(layer.feature, activeYear)
             });
-            app.countyInfo.update();
+            countyInfo.update();
         }
         function onClick(e) {
             map.fitBounds(e.target.getBounds(), {});

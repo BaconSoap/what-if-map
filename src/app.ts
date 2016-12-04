@@ -3,7 +3,7 @@
 
 declare namespace L {
   namespace Control {
-    function extend<T>(options?: T): L.Control & T & { new (opts: any): L.Control & T };
+    function extend<T>(options?: T): L.Control & T & { new (opts?: any): L.Control & T };
   }
 }
 
@@ -26,7 +26,7 @@ namespace app {
   var allCountyData: GeoJSON.GeoJsonObject;
   var countiesLayers: {[year: string]: L.Layer} = {};
   var map: L.Map;
-
+  let countyInfo: ICountyInfo;
   function init() {
     // create a new map with no base layer
     map = L.map('election-map', {
@@ -41,6 +41,7 @@ namespace app {
     addCounties('2016');
     addStates();
 
+    countyInfo = new CountyInfo() as any;
     countyInfo.addTo(map);
     var selector = new dropdownControl({ selectOptions: [{ text: '2016' }, { text: '2012' }], label: 'Year:' })
     selector.addTo(map);
