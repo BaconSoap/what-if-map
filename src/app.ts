@@ -1,38 +1,37 @@
-$(document).foundation();
+///<reference path="../node_modules/@types/leaflet/index.d.ts" />
+/// <reference path="./controls.ts" />
 
-var demRepubScale = chroma.scale(['red', 'white', 'blue']).domain([-1, 0, 1]);
+declare namespace L {
+  namespace Control {
+    function extend<T>(options?: T): L.Control & T & { new (opts: any) };
+  }
+}
 
-(function () {
+namespace app {
+  type Year = '2012' | '2016';
+
+  interface IDataLayerProperties {
+
+  }
+
+  $(document).foundation();
+
+  var demRepubScale = chroma.scale(['red', 'white', 'blue']).domain([-1, 0, 1]);
+  var activeYear: Year = '2016';
+
   var allCountyData;
   var countiesLayers = {};
   var map;
-  var countyInfo = L.control();
-  var activeYear = '2016';
-
-  countyInfo.onAdd = function (map) {
-    this._div = L.DomUtil.create('div', 'custom-control county-info');
-    this.update();
-    return this._div;
-  };
-
-  countyInfo.update = function (props, year) {
-    this._div.innerHTML = '<h6>Election Results</h6>' +
-      (props && props['total_votes_' + year]
-        ? props.county_name + ', ' + props.state_abbr +
-        '<br/>Dem: ' + props['votes_dem_' + year].toLocaleString() +
-        '<br/>GOP: ' + props['votes_gop_' + year].toLocaleString()
-        : '');
-  };
 
   function init() {
     // create a new map with no base layer
-    map = new L.Map('election-map', {
-      center: new L.LatLng(42.3964631, -91.1205171),
+    map = L.map('election-map', {
+      center: L.latLng(42.3964631, -91.1205171),
       zoom: 4
     });
 
     // use Stamen's 'terrain' base layer
-    var layer = new L.StamenTileLayer('toner');
+    var layer = new (L as any).StamenTileLayer('toner') as L.TileLayer;
     map.addLayer(layer);
 
     addCounties('2016');
@@ -41,7 +40,7 @@ var demRepubScale = chroma.scale(['red', 'white', 'blue']).domain([-1, 0, 1]);
     countyInfo.addTo(map);
     var selector = new dropdownControl({ selectOptions: [{ text: '2016' }, { text: '2012' }], label: 'Year:' })
     selector.addTo(map);
-    selector.onChange(function(e) {
+    selector.onChange(function (e) {
       var year = e.target.value;
       addCounties(year);
     });
@@ -67,7 +66,7 @@ var demRepubScale = chroma.scale(['red', 'white', 'blue']).domain([-1, 0, 1]);
     }
 
     function setLayer() {
-      data = allCountyData;
+      let data = allCountyData;
       var countiesLayer = L.geoJSON(data, {
         pane: 'counties',
         style: function (feature) {
@@ -94,8 +93,8 @@ var demRepubScale = chroma.scale(['red', 'white', 'blue']).domain([-1, 0, 1]);
       countiesLayers['active'] = countiesLayer;
     }
 
-    function getColor(feature, year) {
-      var p = feature.properties;
+    function getColor(feature, year: Year) {
+      var p = feature.properties as IDataLayerProperties;
       return demRepubScale((p['votes_dem_' + year] - p['votes_gop_' + year]) / p['total_votes_' + year] * 2);
     }
 
@@ -144,22 +143,6 @@ var demRepubScale = chroma.scale(['red', 'white', 'blue']).domain([-1, 0, 1]);
   }
 
   document.addEventListener('DOMContentLoaded', init);
-})();
 
-var dropdownControl = L.Control.extend({
-  options: { position: 'topleft', selectOptions: [], label: '' },
-  onAdd(map) {
-    this._container = L.DomUtil.create('div', 'custom-control');
-    var label = L.DomUtil.create('span', '', this._container);
-    label.innerHTML = this.options.label;
-    this._select = L.DomUtil.create('select', '', this._container);
-    var inner = this.options.selectOptions.map(function (s) { return '<option>' + s.text + '</option>'; }).join('');
-    this._select.innerHTML = inner;
-    this._select.onmousedown = L.DomEvent.stopPropagation;
-    return this._container;
-  },
-  onChange: function (onChange) {
-    this._onChange = onChange;
-    this._select.onchange = onChange;
-  }
-})
+
+}
