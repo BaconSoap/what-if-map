@@ -3,15 +3,19 @@
 
 declare namespace L {
   namespace Control {
-    function extend<T>(options?: T): L.Control & T & { new (opts: any) };
+    function extend<T>(options?: T): L.Control & T & { new (opts: any): L.Control & T };
   }
 }
 
 namespace app {
   type Year = '2012' | '2016';
-
   interface IDataLayerProperties {
-
+    votes_dem_2016: number;
+    votes_dem_2012: number;
+    votes_gop_2016: number;
+    votes_gop_2012: number;
+    total_votes_2016: number;
+    totale_votes_2012: number;
   }
 
   $(document).foundation();
@@ -19,9 +23,9 @@ namespace app {
   var demRepubScale = chroma.scale(['red', 'white', 'blue']).domain([-1, 0, 1]);
   var activeYear: Year = '2016';
 
-  var allCountyData;
-  var countiesLayers = {};
-  var map;
+  var allCountyData: GeoJSON.GeoJsonObject;
+  var countiesLayers: {[year: string]: L.Layer} = {};
+  var map: L.Map;
 
   function init() {
     // create a new map with no base layer
@@ -40,13 +44,13 @@ namespace app {
     countyInfo.addTo(map);
     var selector = new dropdownControl({ selectOptions: [{ text: '2016' }, { text: '2012' }], label: 'Year:' })
     selector.addTo(map);
-    selector.onChange(function (e) {
-      var year = e.target.value;
+    selector.onChange(function (e: OnChangeEvent) {
+      var year = e.target.value as Year;
       addCounties(year);
     });
   }
 
-  function addCounties(year) {
+  function addCounties(year: Year) {
     var countiesPane = map.getPane('counties') || map.createPane('counties');
     activeYear = year;
     if (countiesLayers[year]) {
@@ -93,21 +97,21 @@ namespace app {
       countiesLayers['active'] = countiesLayer;
     }
 
-    function getColor(feature, year: Year) {
-      var p = feature.properties as IDataLayerProperties;
+    function getColor(feature: GeoJSON.Feature<GeoJSON.GeometryObject>, year: Year) {
+      var p = feature.properties as any;
       return demRepubScale((p['votes_dem_' + year] - p['votes_gop_' + year]) / p['total_votes_' + year] * 2);
     }
 
-    function onHover(e) {
-      var layer = e.target;
+    function onHover(e: L.LayerEvent) {
+      var layer = e.target as L.Path;
       layer.setStyle({
         weight: 5,
         color: 'gold'
       });
-      countyInfo.update(layer.feature.properties, activeYear);
+      countyInfo.update((layer as any).feature.properties, activeYear);
     }
 
-    function onUnhover(e) {
+    function onUnhover(e: L.LayerEvent) {
       var layer = e.target;
       layer.setStyle({
         weight: 1,
@@ -117,8 +121,8 @@ namespace app {
       countyInfo.update();
     }
 
-    function onClick(e) {
-      map.fitBounds(e.target.getBounds());
+    function onClick(e: L.LayerEvent & {target: L.Layer}) {
+      map.fitBounds(e.target.getBounds(), {});
     }
   }
 

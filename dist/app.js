@@ -127,7 +127,7 @@ var app;
             app.countyInfo.update();
         }
         function onClick(e) {
-            map.fitBounds(e.target.getBounds());
+            map.fitBounds(e.target.getBounds(), {});
         }
     }
     function addStates() {
