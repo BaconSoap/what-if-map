@@ -28,7 +28,7 @@ var demRepubScale = chroma.scale(['red', 'white', 'blue']).domain([-1, 0, 1]);
     });
 
     // use Stamen's 'terrain' base layer
-    var layer = new L.StamenTileLayer('terrain');
+    var layer = new L.StamenTileLayer('toner');
     map.addLayer(layer);
 
     addCounties();
