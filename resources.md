@@ -1,3 +1,4 @@
-- [data](https://github.com/tonmcg/County_Level_Election_Results_12-16)
+- [election](https://github.com/tonmcg/County_Level_Election_Results_12-16)
+- [pop data](https://www.ers.usda.gov/data-products/county-level-data-sets/)
 - [leaflet](http://leafletjs.com/reference.html)
 - [mapshaper](https://github.com/mbloch/mapshaper/wiki/Command-Reference)
