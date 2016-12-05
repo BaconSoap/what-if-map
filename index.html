@@ -1,35 +1,54 @@
 <!doctype html>
 <html class="no-js" lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>What If...? The 2016 US Election Map</title>
-    <link rel="stylesheet" href="css/app.css">
-    <link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css">
-  </head>
-  <body>
-    <div class="row">
-      <div class="large-12 columns">
-        <h1>What If...?</h1>
-        <h3>The 2016 US Election Map</h3>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What If...? The 2016 US Election Map</title>
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css">
+</head>
+
+<body>
+  <div class="row">
+    <div class="large-12 columns">
+      <h1>What If...?</h1>
+      <h3>The 2016 US Election Map</h3>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="large-12 columns">
+      <div id="election-map"></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="large-4 columns">
+      <div class="input-group">
+        <span class="input-group-label">Scenario</span>
+        <select id="scenario-select" class="input-group-field">
+        </select>
       </div>
     </div>
-
-    <div class="row">
-      <div class="large-12 columns">
-        <div id="election-map"></div>
-      </div>
+    <div class="large-8 columns">
+      Popular Vote Winner: <span id="popWinner"></span> <br />
+      Electoral College Winner: <span id="electoralWinner"></span> <br />
+      Dem Electoral Votes: <span id="demElectoralVotes"></span> <br />
+      GOP Electoral Votes: <span id="gopElectoralVotes"></span> <br />
     </div>
+  </div>
 
-    <script src="bower_components/jquery/dist/jquery.js"></script>
-    <script src="bower_components/what-input/what-input.js"></script>
-    <script src="bower_components/foundation-sites/dist/foundation.js"></script>
-    <script src="bower_components/leaflet/dist/leaflet.js"></script>
-    <script src="bower_components/chroma-js/chroma.min.js"></script>
-    <script src="bower_components/tile.stamen/index.js"></script>
-    <script src="bower_components/leaflet.zoomcss/index.js"></script>
+  <script src="bower_components/jquery/dist/jquery.js"></script>
+  <script src="bower_components/what-input/what-input.js"></script>
+  <script src="bower_components/foundation-sites/dist/foundation.js"></script>
+  <script src="bower_components/leaflet/dist/leaflet.js"></script>
+  <script src="bower_components/chroma-js/chroma.min.js"></script>
+  <script src="bower_components/tile.stamen/index.js"></script>
+  <script src="bower_components/leaflet.zoomcss/index.js"></script>
 
-    <script src="dist/app.js"></script>
-  </body>
+  <script src="dist/app.js"></script>
+</body>
+
 </html>

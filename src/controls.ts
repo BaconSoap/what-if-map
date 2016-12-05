@@ -17,6 +17,8 @@ namespace app {
     }
   });
 
+  export type ICountyInfo = typeof CountyInfo;
+
   export let dropdownControl = L.Control.extend({
     options: { position: 'topleft', selectOptions: [], label: '' },
     onAdd(map: L.Map) {

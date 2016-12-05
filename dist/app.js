@@ -33,15 +33,62 @@ var app;
         }
     });
 })(app || (app = {}));
-///<reference path="../node_modules/@types/leaflet/index.d.ts" />
-/// <reference path="./controls.ts" />
 var app;
 (function (app) {
+    var coastalStates = ['ak', 'al', 'ca', 'ct', 'de', 'fl', 'ga', 'hi', 'la', 'ma', 'md', 'me', 'ms', 'nc', 'nh', 'nj', 'ny', 'or', 'ri', 'sc', 'tx', 'va', 'wa'];
+    app.Scenarios = [];
+    app.Scenarios[0 /* Reality */] = {
+        text: 'As it happened',
+        filter: function (feature) {
+            return true;
+        }
+    };
+    app.Scenarios[1 /* Coastal */] = {
+        text: 'Only coastal states',
+        filter: function (feature) {
+            var abbr = feature.properties.state_abbr || '';
+            return coastalStates.indexOf(abbr.toLowerCase()) > -1;
+        }
+    };
+    app.Scenarios[2 /* NonCoastal */] = {
+        text: 'Only non-coastal states',
+        filter: function (feature) {
+            var abbr = feature.properties.state_abbr || '';
+            return coastalStates.indexOf(abbr.toLowerCase()) === -1;
+        }
+    };
+    var SceneraioPicker = (function () {
+        function SceneraioPicker(targetId) {
+            var _this = this;
+            this.el = document.getElementById(targetId);
+            app.Scenarios.forEach(function (s, i) { return _this.el.add(new Option(s.text, i.toString(), i === 0 /* Reality */)); });
+        }
+        SceneraioPicker.prototype.onChange = function (fn) {
+            this.el.onchange = function (e) {
+                var selected = parseInt(e.target.value);
+                var selectedScenario = app.Scenarios[selected];
+                fn(selectedScenario);
+            };
+        };
+        return SceneraioPicker;
+    }());
+    app.SceneraioPicker = SceneraioPicker;
+})(app || (app = {}));
+///<reference path="../node_modules/@types/leaflet/index.d.ts" />
+/// <reference path="./controls.ts" />
+/// <reference path="./scenarioPicker.ts" />
+var app;
+(function (app) {
+    var voteResults = {
+        electoralVotes: 0,
+        demPopularVotes: 0,
+        gopPopularVotes: 0,
+        demElectoralVotes: 0,
+        gopElectoralVotes: 0
+    };
     $(document).foundation();
     var demRepubScale = chroma.scale(['red', 'white', 'blue']).domain([-1, 0, 1]);
     var activeYear = '2016';
-    var allCountyData;
-    var countiesLayers = {};
     var map;
     var countyInfo;
     function init() {
@@ -63,74 +110,121 @@ var app;
             var year = e.target.value;
             addCounties(year);
         });
+        var picker = new app.SceneraioPicker('scenario-select');
+        picker.onChange(function (scenario) { return setScenario(scenario); });
+    }
+    function setScenario(scenario) {
+        console.log(scenario);
+        var layer = createLayer(scenario.filter);
+        setLayer(layer);
+        showWinner(voteResults);
+    }
+    function showWinner(results) {
+        var demRunner = activeYear === '2016' ? 'Hillary Clinton' : 'Barack Obama';
+        var gopRunner = activeYear === '2016' ? 'Donald Trump' : 'Mitt Romney';
+        var eDemWinner = results.demElectoralVotes > results.gopElectoralVotes;
+        var pDemWinner = results.demPopularVotes > results.gopPopularVotes;
+        $('#electoralWinner').text(eDemWinner ? demRunner : gopRunner);
+        $('#popWinner').text(pDemWinner ? demRunner : gopRunner);
+        $('#gopElectoralVotes').text(results.gopElectoralVotes);
+        $('#demElectoralVotes').text(results.demElectoralVotes);
     }
     function addCounties(year) {
         var countiesPane = map.getPane('counties') || map.createPane('counties');
         activeYear = year;
-        if (countiesLayers[year]) {
-            map.removeLayer(countiesLayers['active']);
-            map.addLayer(countiesLayers[year]);
-            countiesLayers['active'] = countiesLayers[year];
-            return;
-        }
-        if (!allCountyData) {
+        if (!app.allCountyData) {
             jQuery.getJSON('data/counties.json', function (data) {
-                allCountyData = data;
-                setLayer();
+                app.allCountyData = data;
+                var layer = createLayer(function () { return true; });
+                setLayer(layer);
+                showWinner(voteResults);
             });
         }
         else {
-            setLayer();
+            var layer = createLayer(function () { return true; });
+            setLayer(layer);
+            showWinner(voteResults);
         }
-        function setLayer() {
-            var data = allCountyData;
-            var countiesLayer = L.geoJSON(data, {
-                pane: 'counties',
-                style: function (feature) {
-                    var color = getColor(feature, year);
-                    return {
-                        fillOpacity: .9,
-                        fillColor: color,
-                        color: color,
-                        weight: 1,
-                        className: 'county'
-                    };
-                },
-                onEachFeature: function (feature, layer) {
-                    layer.on({
-                        'mouseover': onHover,
-                        'mouseout': onUnhover,
-                        'click': onClick
-                    });
-                }
-            });
-            map.addLayer(countiesLayer);
-            countiesLayers[year] = countiesLayer;
-            countiesLayers['active'] = countiesLayer;
+    }
+    function createLayer(filter) {
+        var data = app.allCountyData;
+        var states = {};
+        var countiesLayer = L.geoJSON(data, {
+            pane: 'counties',
+            style: function (feature) {
+                var color = getColor(feature);
+                return {
+                    fillOpacity: .9,
+                    fillColor: color,
+                    color: color,
+                    weight: 1,
+                    className: 'county'
+                };
+            },
+            onEachFeature: function (feature, layer) {
+                var p = feature.properties;
+                var state = (p.state_abbr || '').toLowerCase();
+                var s = states[state] || { electoralVotes: p.electoral_votes, demPopularVotes: 0, gopPopularVotes: 0 };
+                states[state] = s;
+                s.gopPopularVotes += p['votes_gop_' + activeYear];
+                s.demPopularVotes += p['votes_dem_' + activeYear];
+                layer.on({
+                    'mouseover': onHover,
+                    'mouseout': onUnhover,
+                    'click': onClick
+                });
+            },
+            filter: function (feature) {
+                return filter(feature);
+            }
+        });
+        var total = { electoralVotes: 0, demPopularVotes: 0, gopPopularVotes: 0, demElectoralVotes: 0, gopElectoralVotes: 0 };
+        for (var stateCode in states) {
+            if (stateCode.length === 2) {
+                var stateResult = states[stateCode];
+                var electoralVotes = stateResult.electoralVotes;
+                var isDemWinner = stateResult.demPopularVotes > stateResult.gopPopularVotes;
+                total.electoralVotes += electoralVotes;
+                total.demElectoralVotes += isDemWinner ? electoralVotes : 0;
+                total.gopElectoralVotes += !isDemWinner ? electoralVotes : 0;
+                total.demPopularVotes += stateResult.demPopularVotes;
+                total.gopPopularVotes += stateResult.gopPopularVotes;
+            }
         }
-        function getColor(feature, year) {
-            var p = feature.properties;
-            return demRepubScale((p['votes_dem_' + year] - p['votes_gop_' + year]) / p['total_votes_' + year] * 2);
+        voteResults = total;
+        return countiesLayer;
+    }
+    var activeCountiesLayer;
+    function setLayer(layer) {
+        if (activeCountiesLayer) {
+            map.removeLayer(activeCountiesLayer);
         }
-        function onHover(e) {
-            var layer = e.target;
-            layer.setStyle({
-                weight: 5,
-                color: 'gold'
-            });
-            countyInfo.update(layer.feature.properties, activeYear);
-        }
-        function onUnhover(e) {
-            var layer = e.target;
-            layer.setStyle({
-                weight: 1,
-                color: getColor(layer.feature, activeYear)
-            });
-            countyInfo.update();
-        }
-        function onClick(e) {
-            map.fitBounds(e.target.getBounds(), {});
-        }
+        activeCountiesLayer = layer;
+        map.addLayer(activeCountiesLayer);
+    }
+    function getColor(feature) {
+        var year = activeYear;
+        var p = feature.properties;
+        return demRepubScale((p['votes_dem_' + year] - p['votes_gop_' + year]) / p['total_votes_' + year] * 2);
+    }
+    function onHover(e) {
+        var layer = e.target;
+        layer.setStyle({
+            weight: 5,
+            color: 'gold'
+        });
+        countyInfo.update(layer.feature.properties, activeYear);
+    }
+    function onUnhover(e) {
+        var layer = e.target;
+        layer.setStyle({
+            weight: 1,
+            color: getColor(layer.feature)
+        });
+        countyInfo.update();
+    }
+    function onClick(e) {
+        map.fitBounds(e.target.getBounds(), {});
     }
     function addStates() {
         var statesPane = map.createPane('states');
