@@ -33,6 +33,7 @@ namespace app {
 
   var demRepubScale = chroma.scale(['red', 'white', 'blue']).domain([-1, 0, 1]);
   var activeYear: Year = '2016';
+  let activeScenario: IScenario;
 
   export var allCountyData: GeoJSON.GeoJsonObject;
   var map: L.Map;
@@ -48,8 +49,9 @@ namespace app {
     var layer = new (L as any).StamenTileLayer('toner') as L.TileLayer;
     map.addLayer(layer);
 
-    addCounties('2016');
+    activeScenario = Scenarios[ScenarioTypes.Reality];
 
+    addCounties('2016');
     addStates();
 
     countyInfo = new CountyInfo() as any;
@@ -65,7 +67,7 @@ namespace app {
   }
 
   function setScenario(scenario: IScenario) {
-    console.log(scenario);
+    activeScenario = scenario;
     let layer = createLayer(scenario.filter);
     setLayer(layer);
     showWinner(voteResults);
@@ -90,12 +92,12 @@ namespace app {
     if (!allCountyData) {
       jQuery.getJSON('data/counties.json', function (data) {
         allCountyData = data;
-        let layer = createLayer(() => true);
+        let layer = createLayer(activeScenario.filter);
         setLayer(layer);
         showWinner(voteResults);
       });
     } else {
-      let layer = createLayer(() => true);
+      let layer = createLayer(activeScenario.filter);
       setLayer(layer);
       showWinner(voteResults);
     }

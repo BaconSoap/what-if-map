@@ -2,10 +2,12 @@ namespace app {
   export const enum ScenarioTypes {
     Reality,
     Coastal,
-    NonCoastal
+    NonCoastal,
+    NewEngland
   }
 
-  let coastalStates = ['ak', 'al', 'ca', 'ct', 'de', 'fl', 'ga', 'hi', 'la', 'ma', 'md', 'me', 'ms', 'nc', 'nh', 'nj', 'ny', 'or', 'ri', 'sc', 'tx', 'va', 'wa']
+  let coastalStates = ['ak', 'al', 'ca', 'ct', 'de', 'fl', 'ga', 'hi', 'la', 'ma', 'md', 'me', 'ms', 'nc', 'nh', 'nj', 'ny', 'or', 'ri', 'sc', 'tx', 'va', 'wa'];
+  let newEnglandStates = ['me', 'vt', 'nh', 'ma', 'ri', 'ct'];
   export interface IScenario {
     text: string;
     filter: (feature: GeoJSON.Feature<any>) => boolean;
@@ -30,7 +32,14 @@ namespace app {
       let abbr = feature.properties.state_abbr || '';
       return coastalStates.indexOf(abbr.toLowerCase()) === -1;
     }
-  }
+  };
+  Scenarios[ScenarioTypes.NewEngland] = {
+    text: 'Only New England *',
+    filter: (feature: GeoJSON.Feature<any>) => {
+      let abbr = feature.properties.state_abbr || '';
+      return newEnglandStates.indexOf(abbr.toLowerCase()) > -1;
+    }
+  };
 
   export class SceneraioPicker {
     el: HTMLSelectElement;

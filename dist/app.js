@@ -36,6 +36,7 @@ var app;
 var app;
 (function (app) {
     var coastalStates = ['ak', 'al', 'ca', 'ct', 'de', 'fl', 'ga', 'hi', 'la', 'ma', 'md', 'me', 'ms', 'nc', 'nh', 'nj', 'ny', 'or', 'ri', 'sc', 'tx', 'va', 'wa'];
+    var newEnglandStates = ['me', 'vt', 'nh', 'ma', 'ri', 'ct'];
     app.Scenarios = [];
     app.Scenarios[0 /* Reality */] = {
         text: 'As it happened',
@@ -55,6 +56,13 @@ var app;
         filter: function (feature) {
             var abbr = feature.properties.state_abbr || '';
             return coastalStates.indexOf(abbr.toLowerCase()) === -1;
+        }
+    };
+    app.Scenarios[3 /* NewEngland */] = {
+        text: 'Only New England *',
+        filter: function (feature) {
+            var abbr = feature.properties.state_abbr || '';
+            return newEnglandStates.indexOf(abbr.toLowerCase()) > -1;
         }
     };
     var SceneraioPicker = (function () {
@@ -89,6 +97,7 @@ var app;
     $(document).foundation();
     var demRepubScale = chroma.scale(['red', 'white', 'blue']).domain([-1, 0, 1]);
     var activeYear = '2016';
+    var activeScenario;
     var map;
     var countyInfo;
     function init() {
@@ -100,6 +109,7 @@ var app;
         // use Stamen's 'terrain' base layer
         var layer = new L.StamenTileLayer('toner');
         map.addLayer(layer);
+        activeScenario = app.Scenarios[0 /* Reality */];
         addCounties('2016');
         addStates();
         countyInfo = new app.CountyInfo();
@@ -114,7 +124,7 @@ var app;
         picker.onChange(function (scenario) { return setScenario(scenario); });
     }
     function setScenario(scenario) {
-        console.log(scenario);
+        activeScenario = scenario;
         var layer = createLayer(scenario.filter);
         setLayer(layer);
         showWinner(voteResults);
@@ -135,13 +145,13 @@ var app;
         if (!app.allCountyData) {
             jQuery.getJSON('data/counties.json', function (data) {
                 app.allCountyData = data;
-                var layer = createLayer(function () { return true; });
+                var layer = createLayer(activeScenario.filter);
                 setLayer(layer);
                 showWinner(voteResults);
             });
         }
         else {
-            var layer = createLayer(function () { return true; });
+            var layer = createLayer(activeScenario.filter);
             setLayer(layer);
             showWinner(voteResults);
         }
