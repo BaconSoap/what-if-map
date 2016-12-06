@@ -46,7 +46,7 @@ namespace app {
     });
 
     // use Stamen's 'terrain' base layer
-    var layer = new (L as any).StamenTileLayer('toner') as L.TileLayer;
+    var layer = L.tileLayer('http://{s}.tiles.varnerin.info/a/{z}/{x}/{y}/tile.png', {maxZoom: 11, subdomains: 'abc'});
     map.addLayer(layer);
 
     activeScenario = Scenarios[ScenarioTypes.Reality];

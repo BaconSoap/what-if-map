@@ -107,7 +107,7 @@ var app;
             zoom: 4
         });
         // use Stamen's 'terrain' base layer
-        var layer = new L.StamenTileLayer('toner');
+        var layer = L.tileLayer('http://{s}.tiles.varnerin.info/a/{z}/{x}/{y}/tile.png', { maxZoom: 11, subdomains: 'abc' });
         map.addLayer(layer);
         activeScenario = app.Scenarios[0 /* Reality */];
         addCounties('2016');
